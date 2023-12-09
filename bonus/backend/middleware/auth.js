@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 
 // check is user is authenticated
 exports.isAuthenticated = async (req, res, next) => {
-    const { token } = req.cookies;
+    const token = req.headers.authorization;
     // Make sure token exists
     if (!token) {
         return next(new ErrorResponse('You must log in!', 401));
@@ -12,12 +12,12 @@ exports.isAuthenticated = async (req, res, next) => {
 
     try {
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, "Dangloan");
         req.user = await User.findById(decoded.id);
         next();
 
     } catch (error) {
-        return next(new ErrorResponse('You must log in!', 401));
+        return next(new ErrorResponse('Wrong token!', 401));
     }
 }
 

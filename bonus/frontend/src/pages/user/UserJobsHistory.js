@@ -8,7 +8,6 @@ import CardElement from '../../component/CardElement'
 const UserJobsHistory = () => {
     const { user } = useSelector(state => state.userProfile);
 
-
     return (
         <>
             <Box>

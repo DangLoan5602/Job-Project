@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { toast } from 'react-toastify'
 import {
     DELETE_JOB_FAIL,
@@ -14,12 +13,13 @@ import {
     REGISTER_JOB_REQUEST,
     REGISTER_JOB_SUCCESS
 } from "../constants/jobconstant"
+import httpClient from '../../lib/httpClient';
 
 
 export const jobLoadAction = (pageNumber, keyword = '', cat = '', location = '') => async (dispatch) => {
     dispatch({ type: JOB_LOAD_REQUEST });
     try {
-        const { data } = await axios.get(`/api/jobs/show/?pageNumber=${pageNumber}&keyword=${keyword}&cat=${cat}&location=${location}`)
+        const { data } = await httpClient.get(`/api/jobs/show/?pageNumber=${pageNumber}&keyword=${keyword}&cat=${cat}&location=${location}`)
         dispatch({
             type: JOB_LOAD_SUCCESS,
             payload: data
@@ -36,7 +36,7 @@ export const jobLoadAction = (pageNumber, keyword = '', cat = '', location = '')
 export const jobLoadSingleAction = (id) => async (dispatch) => {
     dispatch({ type: JOB_LOAD_SINGLE_REQUEST });
     try {
-        const { data } = await axios.get(`/api/job/${id}`);
+        const { data } = await httpClient.get(`/api/job/${id}`);
         dispatch({
             type: JOB_LOAD_SINGLE_SUCCESS,
             payload: data
@@ -54,7 +54,7 @@ export const jobLoadSingleAction = (id) => async (dispatch) => {
 export const deleteSingleJobAction = (job_id) => async (dispatch) => {
     dispatch({ type: DELETE_JOB_REQUEST });
     try {
-        const { data } = await axios.delete(`/api/job/delete/${job_id}`);
+        const { data } = await httpClient.delete(`/api/job/delete/${job_id}`);
         dispatch({
             type: DELETE_JOB_SUCCESS,
             payload: data
@@ -74,7 +74,7 @@ export const registerAjobAction = (job) => async (dispatch) => {
     dispatch({ type: REGISTER_JOB_REQUEST })
 
     try {
-        const { data } = await axios.post("/api/job/create", job)
+        const { data } = await httpClient.post("/api/job/create", job)
         dispatch({
             type: REGISTER_JOB_SUCCESS,
             payload: data
