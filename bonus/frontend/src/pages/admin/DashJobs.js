@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteSingleJobAction, jobLoadAction } from '../../redux/actions/jobAction';
@@ -44,6 +44,9 @@ const DashJobs = () => {
             field: 'title',
             headerName: 'Job name',
             width: 150,
+            renderCell: (value => (
+                <Link to={`/admin/jobs/${value.row._id}`} style={{ color: "white", textDecoration: "none" }}>{value.row.title}</Link>
+            ))
         },
         {
             field: 'jobType',

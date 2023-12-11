@@ -1,23 +1,32 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { allUsers, singleUser, editUser, deleteUser, createUserJobsHistory } = require('../controllers/userController');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
-
+const {
+  allUsers,
+  singleUser,
+  editUser,
+  deleteUser,
+  createUserJobsHistory,
+  getHistoryJobsApply,
+} = require("../controllers/userController");
+const { isAuthenticated, isAdmin } = require("../middleware/auth");
+const { uploadCloud } = require("../config/cloudinary");
 
 //user routes
 
 // /api/allusers
-router.get('/allusers', isAuthenticated, isAdmin, allUsers);
+router.get("/allusers", isAuthenticated, isAdmin, allUsers);
 // /api/user/id
-router.get('/user/:id', isAuthenticated, singleUser);
+router.get("/user/:id", isAuthenticated, singleUser);
 // /api/user/edit/id
-router.put('/user/edit/:id', isAuthenticated, editUser);
+router.put("/user/edit/:id", isAuthenticated, editUser);
 // /api/admin/user/delete/id
-router.delete('/admin/user/delete/:id', isAuthenticated, isAdmin, deleteUser);
+router.delete("/admin/user/delete/:id", isAuthenticated, isAdmin, deleteUser);
 // /api/user/jobhistory
-router.post('/user/jobhistory', isAuthenticated, createUserJobsHistory);
-
-
-
+router.post(
+  "/user/jobhistory",
+  isAuthenticated,
+  uploadCloud.single("file"),
+  createUserJobsHistory
+);
 
 module.exports = router;

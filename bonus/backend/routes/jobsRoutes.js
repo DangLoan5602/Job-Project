@@ -1,24 +1,33 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { createJob, singleJob, updateJob, showJobs, deleteJob } = require('../controllers/jobsController');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
-
-
+const {
+  createJob,
+  singleJob,
+  updateJob,
+  showJobs,
+  deleteJob,
+  getHistoryJobsApply,
+  jobApplicants,
+} = require("../controllers/jobsController");
+const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 //jobs routes
 
 // /api/job/create
-console.log('jobs router')
-router.post('/job/create', isAuthenticated, isAdmin, createJob);
+
+router.post("/job/create", isAuthenticated, isAdmin, createJob);
 // /api/job/id
-router.get('/job/:id', singleJob);
+router.get("/job/history", isAuthenticated, getHistoryJobsApply);
+
+router.get("/job/:id", isAuthenticated, singleJob);
+
+router.get("/job/applicants/:id", isAuthenticated, jobApplicants);
+
 // /api/job/update/job_id
-router.put('/job/update/:job_id', isAuthenticated, isAdmin, updateJob);
+router.put("/job/update/:job_id", isAuthenticated, isAdmin, updateJob);
 // /api/job/delete/job_id
-router.delete('/job/delete/:job_id', isAuthenticated, isAdmin, deleteJob);
+router.delete("/job/delete/:job_id", isAuthenticated, isAdmin, deleteJob);
 // /api/jobs/show
-router.get('/jobs/show', showJobs);
-
-
+router.get("/jobs/show", showJobs);
 
 module.exports = router;

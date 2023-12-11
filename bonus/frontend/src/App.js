@@ -28,6 +28,7 @@ import { createTheme } from '@mui/material/styles';
 import { themeColors } from './theme'
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
+import DashSingleJob from './pages/admin/DashSingleJob';
 
 //HOC
 const UserDashboardHOC = Layout(UserDashboard);
@@ -36,6 +37,7 @@ const UserInfoDashboardHOC = Layout(UserInfoDashboard);
 const AdminDashboardHOC = Layout(AdminDashboard);
 const DashUsersHOC = Layout(DashUsers);
 const DashJobsHOC = Layout(DashJobs);
+const DashJobHOC = Layout(DashSingleJob)
 const DashCategoryHOC = Layout(DashCategory)
 const DashCreateJobHOC = Layout(DashCreateJob)
 const DashCreateCategoryHOC = Layout(DashCreateCategory)
@@ -65,6 +67,7 @@ const App = () => {
                             <Route path='/admin/dashboard' element={<AdminRoute><AdminDashboardHOC /></AdminRoute>} />
                             <Route path='/admin/users' element={<AdminRoute><DashUsersHOC /></AdminRoute>} />
                             <Route path='/admin/jobs' element={<AdminRoute><DashJobsHOC /></AdminRoute>} />
+                            <Route path='/admin/jobs/:id' element={<AdminRoute><DashJobHOC /></AdminRoute>} />
                             <Route path='/admin/category' element={<AdminRoute><DashCategoryHOC /></AdminRoute>} />
                             <Route path='/admin/job/create' element={<AdminRoute><DashCreateJobHOC /></AdminRoute>} />
                             <Route path='/admin/category/create' element={<AdminRoute><DashCreateCategoryHOC /></AdminRoute>} />

@@ -1,3 +1,4 @@
+const jobHistoryModel = require("../models/jobHistoryModel");
 const User = require("../models/userModel");
 const ErrorResponse = require("../utils/errorResponse");
 
@@ -67,9 +68,10 @@ exports.logout = (req, res, next) => {
 // user profile
 exports.userProfile = async (req, res, next) => {
   const user = await User.findById(req.user.id).select("-password");
-
+  const jobHistory = await jobHistoryModel.find({ user: req.user.id });
   res.status(200).json({
     success: true,
     user,
+    jobHistory,
   });
 };

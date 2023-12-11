@@ -37,10 +37,6 @@ const LogIn = () => {
                 navigate('/user/dashboard');
             }
         }
-
-        // if (isAuthenticated) {
-        //     navigate('/user/dashboard');
-        // }
     }, [isAuthenticated])
 
     const formik = useFormik({
