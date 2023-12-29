@@ -62,6 +62,7 @@ const HeaderTop = () => {
 
     const { collapseSidebar } = useProSidebar();
     const { user } = useSelector(state => state.userProfile);
+    const { userInfo } = useSelector((state) => state.signIn)
     const { palette } = useTheme();
     const dispatch = useDispatch();
 
@@ -84,7 +85,7 @@ const HeaderTop = () => {
                         component="div"
                         sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                     >
-                      {user && user.role === 0 ? "Applicant ": "HR "}APP
+                      {userInfo && userInfo.user.role === 0 ? "Applicant ": "HR "}APP
                     </Typography>
 
                     {/* toggle dark theme */}

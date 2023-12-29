@@ -3,6 +3,7 @@ const JobType = require("../models/jobTypeModel");
 const JobHistory = require("../models/jobHistoryModel");
 const ErrorResponse = require("../utils/errorResponse");
 const jobHistoryModel = require("../models/jobHistoryModel");
+const { sendMail } = require("../utils/sendMail");
 
 //create job
 exports.createJob = async (req, res, next) => {
@@ -47,13 +48,15 @@ exports.singleJob = async (req, res, next) => {
 exports.jobApplicants = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const applicants = await jobHistoryModel.find({ jobId: id });
+    const applicants = await jobHistoryModel
+      .find({ jobId: id })
+      .populate("user");
     return res.status(200).json({
       success: true,
-      applicants
+      applicants,
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -152,14 +155,84 @@ exports.showJobs = async (req, res, next) => {
     next(error);
   }
 };
+exports.showJobsCreate = async (req, res, next) => {
+  //enable search
+  const keyword = req.query.keyword;
+  console.log("user: ", req.user)
+    ? {
+        title: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : {};
+
+  //enable pagination
+  const pageSize = 5;
+  const page = Number(req.query.pageNumber) || 1;
+  //const count = await Job.find({}).estimatedDocumentCount();
+  const count = await Job.find({
+    user: req.user._id,
+  }).countDocuments();
+
+  try {
+    const jobs = await Job.find({
+      user: req.user._id,
+    })
+      .sort({ createdAt: -1 })
+      .populate("jobType", "jobTypeName")
+      .populate("user", "firstName")
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+    res.status(200).json({
+      success: true,
+      jobs,
+      page,
+      pages: Math.ceil(count / pageSize),
+      count,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.getHistoryJobsApply = async (req, res, next) => {
-  
   const user = req.user;
   try {
-    const applicants = await jobHistoryModel.find({ user: user._id }).populate("jobId");
+    const applicants = await jobHistoryModel
+      .find({ user: user._id })
+      .populate("jobId");
+    console.log("applicants: ", applicants);
     return res.status(200).json({ success: true, applicants });
   } catch (error) {
-    next(error)
+    next(error);
+  }
+};
+
+exports.acceptJob = async (req, res, next) => {
+  const { id, email, subject, htmlForm } = req.body;
+  console.log({ id, email, subject, htmlForm });
+  try {
+    await jobHistoryModel.findByIdAndUpdate(id, {
+      applicationStatus: "accepted",
+    });
+    sendMail(email, subject, htmlForm);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.rejectJob = async (req, res, next) => {
+  const { id, email, subject, htmlForm } = req.body;
+  console.log({ id, email, subject, htmlForm })
+  try {
+    await jobHistoryModel.findByIdAndUpdate(id, {
+      applicationStatus: "rejected",
+    });
+    sendMail(email, subject, htmlForm);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
   }
 };

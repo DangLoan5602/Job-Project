@@ -10,6 +10,7 @@ import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux'
 import { userSignInAction } from '../redux/actions/userAction'
 import { useNavigate } from 'react-router-dom'
+import socket from '../lib/socket'
 
 const validationSchema = yup.object({
     email: yup
@@ -32,7 +33,7 @@ const LogIn = () => {
 
         if (isAuthenticated) {
             if (userInfo.role === 1) {
-                navigate('/admin/dashboard');
+                navigate('/admin/users');
             } else {
                 navigate('/user/dashboard');
             }

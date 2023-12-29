@@ -176,6 +176,9 @@ const Navbar = () => {
                   alt="Remy Sharp"
                   src=""
                 />
+                <Typography>
+                  {userInfo ? `Hello, ${userInfo.user.firstName}` : null}
+                </Typography>
               </IconButton>
             </Tooltip>
             <Menu
@@ -209,9 +212,9 @@ const Navbar = () => {
                       textDecoration: "none",
                       color: palette.secondary.main,
                     }}
-                    to="/admin/dashboard"
+                    to="/admin/users"
                   >
-                    Admin Dashboard
+                    Admin User
                   </Link>
                 </Typography>
               </MenuItem>
@@ -228,18 +231,16 @@ const Navbar = () => {
               </MenuItem>
 
               {!userInfo ? (
-                 <Link
-                 style={{
-                   textDecoration: "none",
-                   color: palette.secondary.main,
-                 }}
-                 to="/login"
-               >
-                <MenuItem onClick={handleCloseUserMenu}>
-                 
+                <Link
+                  style={{
+                    textDecoration: "none",
+                    color: palette.secondary.main,
+                  }}
+                  to="/login"
+                >
+                  <MenuItem onClick={handleCloseUserMenu}>
                     <Typography textAlign="center">Log In</Typography>
-                  
-                </MenuItem>
+                  </MenuItem>
                 </Link>
               ) : (
                 <MenuItem onClick={logOutUser}>

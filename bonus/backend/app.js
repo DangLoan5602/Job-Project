@@ -6,7 +6,30 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 var cors = require("cors");
 const path = require("path");
+const { Server } = require("socket.io");
+const http = require("http");
 
+const server = http.createServer(app);
+const io = new Server(server, {
+  connectionStateRecovery: {},
+ cors: {
+    origin: "*",
+  }
+});
+io.on("connection", (socket) => {
+  socket.on("active-user", (data) => {
+    addUser({ id: socket.id, _id: data._id });
+    socket._id = data._id;
+  });
+  socket.on('accept', data => {
+    const {id, userId} = data
+    
+  })
+  socket.on("disconnect", () => {
+    removeUser(socket.id);
+    console.log("user disconnected");
+  });
+});
 // import routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -15,6 +38,7 @@ const jobRoute = require("./routes/jobsRoutes");
 
 const cookieParser = require("cookie-parser");
 const errorHandler = require("./middleware/error");
+const { addUser, removeUser } = require("./data/user");
 
 //database connection
 mongoose
@@ -54,9 +78,9 @@ __dirname = path.resolve();
 //     res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"))
 //   );
 // } else {
-  app.get("/", (req, res) => {
-    res.send("API is running....");
-  });
+app.get("/", (req, res) => {
+  res.send("API is running....");
+});
 // }
 
 // error middleware
@@ -65,6 +89,6 @@ app.use(errorHandler);
 //port
 const port = process.env.PORT || 9000;
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+server.listen(port, () => {
+  console.log(`Server started at http://localhost:${port}`);
 });

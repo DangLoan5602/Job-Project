@@ -10,9 +10,9 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { useDispatch } from "react-redux";
-import { userSignUpAction } from "../redux/actions/userAction";
 import { useNavigate } from "react-router-dom";
+import authApi from "../api/authApi";
+import { toast } from "react-toastify";
 
 const validationSchema = yup.object({
   firstName: yup
@@ -34,8 +34,9 @@ const validationSchema = yup.object({
   role: yup.string("Enter role").required("Role is required"),
 });
 
+const {register} = authApi
+
 const Register = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate()
   const formik = useFormik({
     initialValues: {
@@ -46,10 +47,16 @@ const Register = () => {
       role: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values, actions) => {
-      dispatch(userSignUpAction(values));
-      actions.resetForm();
-    navigate('/login')
+    onSubmit: async (values, actions) => {
+      try {
+        await register(values)
+        actions.resetForm();
+        navigate("/login")
+        toast.success("Register Successfully!");
+      } catch (error) {
+        toast.error("Register Failed");
+      }
+     
     },
   });
 

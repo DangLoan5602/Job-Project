@@ -1,15 +1,24 @@
 const jobHistoryModel = require("../models/jobHistoryModel");
 const User = require("../models/userModel");
 const ErrorResponse = require("../utils/errorResponse");
+const { sendMail } = require("../utils/sendMail");
 
 exports.signup = async (req, res, next) => {
-  const { email } = req.body;
+  const { email, firstName } = req.body;
   const userExist = await User.findOne({ email });
   if (userExist) {
     return next(new ErrorResponse("E-mail already registred", 400));
   }
   try {
     const user = await User.create(req.body);
+    const welcomeText = `Welcome ${firstName} to Job Portal`;
+    const fullUrl = req.protocol + "://" + req.get("host");
+    const htmlForm = `<div>
+    <h1>Welcome to Job Portal!</h1>
+	<p>Thank you for joining our website. We are excited to have you on board!</p>
+  <a href="${fullUrl}/api/user/active/${user._id}">Active account</a>
+    </div>`;
+    sendMail(email, welcomeText, htmlForm);
     res.status(201).json({
       success: true,
       user,
@@ -35,6 +44,9 @@ exports.signin = async (req, res, next) => {
     if (!user) {
       return next(new ErrorResponse("invalid credentials", 400));
     }
+    if(!user.active) {
+      return next(new ErrorResponse("Please active account in email!", 400));
+    }
     //check password
     const isMatched = await user.comparePassword(password);
     if (!isMatched) {
@@ -53,6 +65,7 @@ const sendTokenResponse = async (user, codeStatus, res) => {
     success: true,
     role: user.role,
     token,
+    user
   });
 };
 

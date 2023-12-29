@@ -1,33 +1,34 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Link, useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteSingleJobAction, jobLoadAction } from '../../redux/actions/jobAction';
+import { deleteSingleJobAction } from '../../redux/actions/jobAction';
+import jobApi from '../../api/jobApi';
 
-
+const {getJobbyCreateUser} = jobApi
 
 const DashJobs = () => {
-
-
+    const [jobs, setJobs] = useState([])
     const dispatch = useDispatch();
+    const handleGetJob =async () => {
+       const jobs = await getJobbyCreateUser()
+       setJobs(jobs)
+    }
 
     useEffect(() => {
-        dispatch(jobLoadAction())
-    }, []);
+        handleGetJob()
+    }, [])
 
     const { success: deleteSuccess } = useSelector(state => state.deleteJob);
-    const { jobs, loading } = useSelector(state => state.loadJobs);
-    let data = [];
-    data = (jobs !== undefined && jobs.length > 0) ? jobs : []
 
     // delete a job by id
     const deleteJobById = (e, id) => {
         if (window.confirm(`You really want to delete product ID: "${id}" ?`)) {
             dispatch(deleteSingleJobAction(id));
             if (deleteSuccess && deleteSuccess === true) {
-                dispatch(jobLoadAction())
+                handleGetJob()
             }
         }
     }
@@ -125,7 +126,7 @@ const DashJobs = () => {
                             }
 
                         }}
-                        rows={data}
+                        rows={jobs}
                         columns={columns}
                         pageSize={5}
                         rowsPerPageOptions={[5]}
