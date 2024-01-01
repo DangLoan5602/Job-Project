@@ -3,9 +3,9 @@ module.exports = {
   MAILER: "smtp",
   HOST: "smtp.gmail.com",
   PORT: 587,
-  USERNAME: "phantienhuy20012002",
-  PASSWORD: "oeqezmzajyhkqoaj",
+  USERNAME: "dangthikimloan5602",
+  PASSWORD: "ytge xlzd euzn zvsq",
   ENCRYPTION: "TLS",
-  FROM_ADDRESS:"phantienhuy20012002@gmail.com",
+  FROM_ADDRESS:"dangthikimloan5602@gmail.com",
   FROM_NAME: "JobPortal",
 };
