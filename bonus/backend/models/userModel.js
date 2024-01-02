@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema(
     company: {
       type: ObjectId,
       ref: "Company",
+      required: false,
     },
   },
   { timestamps: true }

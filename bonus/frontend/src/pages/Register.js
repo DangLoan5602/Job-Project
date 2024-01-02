@@ -60,7 +60,7 @@ const Register = () => {
       email: "",
       password: "",
       role: "",
-      company: null,
+      company: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values, actions) => {
@@ -77,13 +77,12 @@ const Register = () => {
 
   useEffect(() => {
     if (formik.values.role === 0) {
-      formik.setFieldValue("company", null);
+      formik.setFieldValue("company", "");
     }
   }, [formik.values.role]);
 
   const handleGetCompanies = async () => {
     const company = await getAllCompany();
-    console.log("company: ", company);
     setCompanies(company);
   };
 

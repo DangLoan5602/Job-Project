@@ -6,23 +6,25 @@ const { sendMail } = require("../utils/sendMail");
 
 exports.signup = async (req, res, next) => {
   const { email, firstName, company, role } = req.body;
+
   const userExist = await User.findOne({ email });
   if (userExist) {
     return next(new ErrorResponse("E-mail already registred", 400));
   }
   try {
     let user;
-    if (!company || company === "") {
-      user = await User.create(req.body);
-    }
-    const companyExist = await companyModel.findOne({ company });
-    if (companyExist) {
-      user = await User.create({ ...req.body, company: companyExist });
+    if (role === 0) {
+      user = await User.create({ ...req.body, company: null });
     } else {
-      const newCompany = await companyModel.create({ company });
-      user = await User.create({ ...req.body, company: newCompany });
+      const companyExist = await companyModel.findOne({ company });
+      if (companyExist) {
+        user = await User.create({ ...req.body, company: companyExist });
+      } else {
+        const newCompany = await companyModel.create({ company });
+        user = await User.create({ ...req.body, company: newCompany });
+      }
     }
-    console.log("user: ", user);
+
     const welcomeText = `Welcome ${firstName} to Job Portal`;
     const fullUrl = req.protocol + "://" + req.get("host");
     const htmlForm = `<div>
