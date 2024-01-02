@@ -62,7 +62,16 @@ const jobApi = {
       return error;
     }
   },
-  updateJobbyId: async (id, title, description, salary, location, jobType) => {
+  updateJobbyId: async (
+    id,
+    title,
+    description,
+    salary,
+    location,
+    jobType,
+    skillExp,
+    reason
+  ) => {
     try {
       const res = await httpClient.put(`/api/job/update/${id}`, {
         title,
@@ -70,6 +79,8 @@ const jobApi = {
         salary,
         location,
         jobType,
+        skillExp,
+        reason,
       });
       return res.data;
     } catch (error) {

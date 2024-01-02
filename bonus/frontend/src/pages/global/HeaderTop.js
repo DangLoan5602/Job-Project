@@ -96,16 +96,6 @@ const HeaderTop = () => {
                             <LightMode sx={{ color: "#ffffff", fontSize: "25px" }} />
                         )}
                     </IconButton>
-
-                    <Search>
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
-                    </Search>
                 </Toolbar>
             </AppBar>
         </Box>

@@ -10,7 +10,7 @@ exports.allUsers = async (req, res, next) => {
   const count = await User.find({}).estimatedDocumentCount();
 
   try {
-    const users = await User.find()
+    const users = await User.find({ role: 0 })
       .sort({ createdAt: -1 })
       .select("-password")
       .skip(pageSize * (page - 1))
@@ -104,7 +104,6 @@ exports.activeUser = async (req, res) => {
   const user = await User.findByIdAndUpdate(id, { active: true });
   if (user) return res.redirect("http://localhost:3000/login");
 };
-
 
 exports.changePassword = async (req, res) => {
   const user = req.user;

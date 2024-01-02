@@ -16,10 +16,12 @@ const SingleJob = () => {
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const { singleJob, loading } = useSelector((state) => state.singleJob);
+  const { userInfo } = useSelector((state) => state.signIn);
   const [file, setFile] = useState();
   const [isApply, setIsApply] = useState(false);
   const [loadingState, setLoading] = useState(false);
   const { id } = useParams();
+
   useEffect(() => {
     dispatch(jobLoadSingleAction(id));
   }, [id]);
@@ -36,12 +38,11 @@ const SingleJob = () => {
     }
     setLoading(false);
   };
-
   return (
     <>
       <Box sx={{ bgcolor: "#fafafa" }}>
         <Navbar />
-        <Box sx={{ height: "calc(100vh - 140px)" }}>
+        <Box sx={{ minHeight: "calc(100vh - 140px)" }}>
           <Container sx={{ pt: "30px" }}>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -64,6 +65,12 @@ const SingleJob = () => {
                       </Typography>
                       <Typography variant="body2">
                         <Box component="span" sx={{ fontWeight: 700 }}>
+                          Company
+                        </Box>
+                        : {singleJob && singleJob?.user?.company?.company}
+                      </Typography>
+                      <Typography variant="body2">
+                        <Box component="span" sx={{ fontWeight: 700 }}>
                           Category
                         </Box>
                         :{" "}
@@ -77,10 +84,37 @@ const SingleJob = () => {
                         </Box>
                         : {singleJob && singleJob.location}
                       </Typography>
-                      <Typography variant="body2" sx={{ pt: 2 }}>
-                        <h3>Job description:</h3>
-                        {singleJob && singleJob.description}
-                      </Typography>
+                      {singleJob?.description && (
+                        <Typography variant="body2" sx={{ pt: 2 }}>
+                          <h3>Job description:</h3>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: singleJob?.description,
+                            }}
+                          />
+                        </Typography>
+                      )}
+                      {singleJob?.skillExp && (
+                        <Typography variant="body2" sx={{ pt: 2 }}>
+                          <h3>Your Skill and Experience:</h3>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: singleJob?.skillExp,
+                            }}
+                          />
+                        </Typography>
+                      )}
+                      {singleJob?.reason && (
+                        <Typography variant="body2" sx={{ pt: 2 }}>
+                          <h3>Why you'll love working here:</h3>
+
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: singleJob?.reason,
+                            }}
+                          />
+                        </Typography>
+                      )}
                     </CardContent>
                   </Card>
                 )}
@@ -125,7 +159,9 @@ const SingleJob = () => {
                     disabled={singleJob?.isApply || !file || isApply}
                   >
                     {singleJob?.isApply || isApply
-                      ? "You already apply"
+                      ? !userInfo
+                        ? "Please sign in first"
+                        : "You already apply"
                       : "Applied for this Job"}
                   </LoadingButton>
                 </Card>

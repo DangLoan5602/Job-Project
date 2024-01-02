@@ -1,4 +1,10 @@
-import { Avatar, Box } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  FilledInput,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
 import Footer from "../component/Footer";
 import Navbar from "../component/Navbar";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
@@ -13,7 +19,13 @@ import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import authApi from "../api/authApi";
 import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import companyApi from "../api/companyApi";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
+const filter = createFilterOptions();
+const { getAllCompany } = companyApi;
 const validationSchema = yup.object({
   firstName: yup
     .string("Enter your First Name")
@@ -32,12 +44,15 @@ const validationSchema = yup.object({
     .min(8, "Password should be of minimum 8 characters length")
     .required("Password is required"),
   role: yup.string("Enter role").required("Role is required"),
+  company: yup.string("Enter your company"),
 });
 
-const {register} = authApi
+const { register } = authApi;
 
 const Register = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [companies, setCompanies] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -45,20 +60,36 @@ const Register = () => {
       email: "",
       password: "",
       role: "",
+      company: null,
     },
     validationSchema: validationSchema,
     onSubmit: async (values, actions) => {
       try {
-        await register(values)
+        await register(values);
         actions.resetForm();
-        navigate("/login")
+        navigate("/login");
         toast.success("Register Successfully!");
       } catch (error) {
         toast.error("Register Failed");
       }
-     
     },
   });
+
+  useEffect(() => {
+    if (formik.values.role === 0) {
+      formik.setFieldValue("company", null);
+    }
+  }, [formik.values.role]);
+
+  const handleGetCompanies = async () => {
+    const company = await getAllCompany();
+    console.log("company: ", company);
+    setCompanies(company);
+  };
+
+  useEffect(() => {
+    handleGetCompanies();
+  }, []);
 
   return (
     <>
@@ -168,9 +199,21 @@ const Register = () => {
               id="password"
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               InputLabelProps={{
                 shrink: true,
+              }}
+              InputProps={{
+                endAdornment: (
+                  <div
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <InputAdornment position="start">
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </InputAdornment>
+                  </div>
+                ),
               }}
               placeholder="Password"
               value={formik.values.password}
@@ -179,7 +222,7 @@ const Register = () => {
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
             />
-            <FormControl sx={{ m: 1, width: "100%" }}>
+            <FormControl sx={{ m: 1, mb: 3, width: "100%" }}>
               <InputLabel id="demo-simple-select-autowidth-label">
                 You are:
               </InputLabel>
@@ -199,6 +242,33 @@ const Register = () => {
                 <MenuItem value={1}>HR</MenuItem>
               </Select>
             </FormControl>
+            {formik.values.role === 1 ? (
+              <TextField
+                sx={{
+                  mb: 3,
+                  "& .MuiInputBase-root": {
+                    color: "text.secondary",
+                  },
+                  fieldset: { borderColor: "rgb(231, 235, 240)" },
+                }}
+                fullWidth
+                id="company"
+                name="company"
+                label="Company"
+                type="company"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                placeholder="Company"
+                value={formik.values.company}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.company && Boolean(formik.errors.company)}
+                helperText={formik.touched.company && formik.errors.company}
+              />
+            ) : (
+              <></>
+            )}
             <Button fullWidth variant="contained" type="submit">
               Register
             </Button>

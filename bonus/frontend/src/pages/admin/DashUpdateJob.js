@@ -1,24 +1,21 @@
-import { Box, MenuItem, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import { Box, Card, MenuItem, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { jobTypeLoadAction } from "../../redux/actions/jobTypeAction";
-import { registerAjobAction } from "../../redux/actions/jobAction";
 import { useNavigate, useParams } from "react-router-dom";
 import jobApi from "../../api/jobApi";
 import { toast } from "react-toastify";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const { getJobbyId, updateJobbyId } = jobApi;
 
 const validationSchema = yup.object({
   title: yup.string("Enter a job title").required("title is required"),
-  description: yup
-    .string("Enter a description")
-    .min(6, "Description should be of minimum 6 characters length")
-    .required("Description is required"),
   salary: yup.number("Enter a salary").required("Salary is required"),
   location: yup.string("Enter a location").required("Location is required"),
   jobType: yup.string("Enter a Category").required("Category is required"),
@@ -27,10 +24,24 @@ const validationSchema = yup.object({
 const DashUpdateJob = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [values, setValues] = useState({
+    reason: "",
+    description: "",
+    skillExp: "",
+  });
   const handleGetJob = async () => {
     const result = await getJobbyId(id);
     formik.setValues(result.job);
+    if (result.job.skillExp) {
+      setValues((prev) => ({ ...prev, skillExp: result.job.skillExp }));
+    }
+    if (result.job.reason) {
+      setValues((prev) => ({ ...prev, reason: result.job.reason }));
+    }
+    if (result.job.description) {
+      setValues((prev) => ({ ...prev, description: result.job.description }));
+    }
   };
 
   useEffect(() => {
@@ -46,32 +57,37 @@ const DashUpdateJob = () => {
   const formik = useFormik({
     initialValues: {
       title: "",
-      description: "",
       salary: "",
       location: "",
       jobType: "",
     },
     validationSchema: validationSchema,
-    onSubmit: async (values, actions) => {
-      const { title, description, salary, location, jobType } = values;
+    onSubmit: async (value, actions) => {
+      const { title, salary, location, jobType } = value;
+      const { description, reason, skillExp } = values;
       try {
-        const result = await updateJobbyId(
+        await updateJobbyId(
           id,
           title,
           description,
           salary,
           location,
-          jobType
+          jobType,
+          skillExp,
+          reason
         );
-        navigate("/admin/jobs")
-        toast.success("update success")
+        navigate("/admin/jobs");
+        toast.success("update success");
       } catch (error) {
-        toast.error("Update Error")
+        toast.error("Update Error");
       }
-
       actions.resetForm();
     },
   });
+
+  const handleInputChange = (name, value) => {
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <>
@@ -89,14 +105,7 @@ const DashUpdateJob = () => {
           component="form"
           className="form_style border-style"
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
+          <Card style={{ border: "none", boxShadow: "none" }}>
             <Typography variant="h5" component="h2" sx={{ pb: 3 }}>
               Update a Job
             </Typography>
@@ -115,27 +124,6 @@ const DashUpdateJob = () => {
               onBlur={formik.handleBlur}
               error={formik.touched.title && Boolean(formik.errors.title)}
               helperText={formik.touched.title && formik.errors.title}
-            />
-            <TextField
-              sx={{ mb: 3 }}
-              fullWidth
-              id="description"
-              name="description"
-              label="Description"
-              type="text"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              placeholder="Description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.description && Boolean(formik.errors.description)
-              }
-              helperText={
-                formik.touched.description && formik.errors.description
-              }
             />
             <TextField
               sx={{ mb: 3 }}
@@ -196,11 +184,74 @@ const DashUpdateJob = () => {
                   </MenuItem>
                 ))}
             </TextField>
+            <div style={{ paddingBottom: 10 }}>
+              <Typography>Description</Typography>
+              <CKEditor
+                editor={ClassicEditor}
+                data={values.description}
+                style={{ width: "100%" }}
+                onReady={(editor) => {
+                  // You can store the "editor" and use when it is needed.
+                  console.log("Editor is ready to use!", editor);
+                }}
+                onChange={(event, editor) => {
+                  handleInputChange("description", editor.getData());
+                }}
+                onBlur={(event, editor) => {
+                  console.log("Blur.", editor);
+                }}
+                onFocus={(event, editor) => {
+                  console.log("Focus.", editor);
+                }}
+              />
+            </div>
+            <div style={{ paddingBottom: 20, paddingTop: 10 }}>
+              <Typography>Skill And Experience</Typography>
+              <CKEditor
+                editor={ClassicEditor}
+                data={values.skillExp}
+                style={{ width: "100%" }}
+                onReady={(editor) => {
+                  // You can store the "editor" and use when it is needed.
+                  console.log("Editor is ready to use!", editor);
+                }}
+                onChange={(event, editor) => {
+                  handleInputChange("skillExp", editor.getData());
+                }}
+                onBlur={(event, editor) => {
+                  console.log("Blur.", editor);
+                }}
+                onFocus={(event, editor) => {
+                  console.log("Focus.", editor);
+                }}
+              />
+            </div>
+            <div style={{ paddingBottom: 20, paddingTop: 10 }}>
+              <Typography>Reason</Typography>
+              <CKEditor
+                editor={ClassicEditor}
+                data={values.reason}
+                style={{ width: "100%" }}
+                onReady={(editor) => {
+                  // You can store the "editor" and use when it is needed.
+                  console.log("Editor is ready to use!", editor);
+                }}
+                onChange={(event, editor) => {
+                  handleInputChange("reason", editor.getData());
+                }}
+                onBlur={(event, editor) => {
+                  console.log("Blur.", editor);
+                }}
+                onFocus={(event, editor) => {
+                  console.log("Focus.", editor);
+                }}
+              />
+            </div>
 
             <Button fullWidth variant="contained" type="submit">
-              Create job
+              Update job
             </Button>
-          </Box>
+          </Card>
         </Box>
       </Box>
     </>

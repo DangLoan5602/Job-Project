@@ -38,12 +38,6 @@ const CardElement = ({
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
           {category}
         </Typography>
-        <Typography variant="body2">
-          Description:{" "}
-          {description
-            ? description.split(" ").slice(0, 20).join(" ") + "..."
-            : ""}
-        </Typography>
       </CardContent>
       <CardActions>
         {status ? (

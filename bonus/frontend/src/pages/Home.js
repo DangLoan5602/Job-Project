@@ -79,7 +79,6 @@ const Home = () => {
                                         }
 
                                     </MenuList>
-
                                 </Box>
                             </Card>
                         </Box>

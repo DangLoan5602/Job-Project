@@ -1,5 +1,5 @@
-import { Avatar, Box } from '@mui/material'
-import React, { useEffect } from 'react'
+import { Avatar, Box, InputAdornment } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import Footer from '../component/Footer'
 import Navbar from '../component/Navbar'
 import LockClockOutlined from '@mui/icons-material/LockClockOutlined'
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { userSignInAction } from '../redux/actions/userAction'
 import { useNavigate } from 'react-router-dom'
 import socket from '../lib/socket'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 const validationSchema = yup.object({
     email: yup
@@ -28,6 +29,7 @@ const validationSchema = yup.object({
 const LogIn = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false)
     const { isAuthenticated, userInfo } = useSelector(state => state.signIn);
     useEffect(() => {
 
@@ -99,10 +101,22 @@ const LogIn = () => {
                             id="password"
                             name="password"
                             label="Password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             InputLabelProps={{
                                 shrink: true,
                             }}
+                            InputProps={{
+                                endAdornment: (
+                                  <div
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    style={{ cursor: "pointer" }}
+                                  >
+                                    <InputAdornment position="start">
+                                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                                    </InputAdornment>
+                                  </div>
+                                ),
+                              }}
                             placeholder="Password"
                             value={formik.values.password}
                             onChange={formik.handleChange}

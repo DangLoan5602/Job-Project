@@ -4,6 +4,8 @@ const JobHistory = require("../models/jobHistoryModel");
 const ErrorResponse = require("../utils/errorResponse");
 const jobHistoryModel = require("../models/jobHistoryModel");
 const { sendMail } = require("../utils/sendMail");
+const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 
 //create job
 exports.createJob = async (req, res, next) => {
@@ -11,6 +13,8 @@ exports.createJob = async (req, res, next) => {
     const job = await Job.create({
       title: req.body.title,
       description: req.body.description,
+      skillExp: req.body.skillExp,
+      reason: req.body.reason,
       salary: req.body.salary,
       location: req.body.location,
       jobType: req.body.jobType,
@@ -28,12 +32,29 @@ exports.createJob = async (req, res, next) => {
 //single job
 exports.singleJob = async (req, res, next) => {
   try {
-    const user = req.user;
     const jobId = req.params.id;
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate({
+      path: "jobType user",
+      populate: {
+        path: "company",
+      },
+    });
     if (!job) {
       return res.status(400).json({ message: "not_found" });
     }
+    const token = req.headers.authorization;
+    if (!token) {
+      return res
+        .status(200)
+        .json({ success: true, job: { ...job.toObject(), isApply: true } });
+    }
+    const decoded = jwt.verify(token, "Dangloan");
+    const user = await User.findById(decoded.id);
+    if (!user)
+      return res
+        .status(200)
+        .json({ success: true, job: { ...job.toObject(), isApply: true } });
+
     const jobHistory = await JobHistory.findOne({ jobId, user: user.id });
 
     res.status(200).json({
@@ -225,7 +246,7 @@ exports.acceptJob = async (req, res, next) => {
 
 exports.rejectJob = async (req, res, next) => {
   const { id, email, subject, htmlForm } = req.body;
-  console.log({ id, email, subject, htmlForm })
+  console.log({ id, email, subject, htmlForm });
   try {
     await jobHistoryModel.findByIdAndUpdate(id, {
       applicationStatus: "rejected",
